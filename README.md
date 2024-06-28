@@ -27,6 +27,6 @@ python ./app.py
 
 ```bash
 cd ./frontend
-npm intall
+npm install
 npm run dev
 ```
