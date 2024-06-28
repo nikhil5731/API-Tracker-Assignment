@@ -58,8 +58,8 @@ async def track_api_hit(request: Request, call_next):
             ip_address=request.client.host,
             request_body=str(await request.body()),
         )
-        # db.add(api_hit)
-        # db.commit()
+        db.add(api_hit)
+        db.commit()
     except Exception as e:
         print(f"Error tracking API hit: {e}")
     finally:
