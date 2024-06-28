@@ -19,7 +19,7 @@ app.add_middleware(
 )
 
 # Database setup
-SQLALCHEMY_DATABASE_URL = "postgresql://username:password@localhost/dbname"
+SQLALCHEMY_DATABASE_URL = "postgresql://postgres:123456789@localhost/apianalytics"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -91,30 +91,26 @@ async def get_browser_stats():
 
     db = SessionLocal()
     try:
-        # Query all user agent strings from the database
-        results = db.query(APIHit.user_agent).all()
+        # Perform the aggregated query to count browser occurrences
+        browser_counts = db.query(APIHit.user_agent, func.count(APIHit.user_agent)).group_by(APIHit.user_agent).all()
+        
+        total_hits = sum(count for _, count in browser_counts)
         
         # Parse user agents and count browsers
-        browser_counts = defaultdict(int)
-        total_hits = 0
+        browser_stats = {}
         
-        for (user_agent_string,) in results:
+        for user_agent_string, count in browser_counts:
             user_agent = user_agents.parse(user_agent_string)
             browser_family = user_agent.browser.family
-            browser_counts[browser_family] += 1
-            total_hits += 1
+            if browser_family in browser_stats:
+                browser_stats[browser_family] += count
+            else:
+                browser_stats[browser_family] = count
         
-        # Calculate percentages
-        browser_stats = {}
-        for browser, count in browser_counts.items():
-            percentage = (count / total_hits) * 100
-            browser_stats[browser] = round(percentage, 2)
+        # Calculate percentages and sort the results
+        browser_stats_percentage = {browser: round((count / total_hits) * 100, 2) for browser, count in browser_stats.items()}
+        sorted_stats = dict(sorted(browser_stats_percentage.items(), key=lambda x: x[1], reverse=True))
         
-        # Sort the results by percentage in descending order
-        sorted_stats = dict(
-            sorted(browser_stats.items(), key=lambda x: x[1], reverse=True)
-        )
-
         return sorted_stats
 
     finally:
