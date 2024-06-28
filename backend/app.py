@@ -4,6 +4,7 @@ from sqlalchemy import create_engine, Column, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
+from sqlalchemy import desc
 import user_agents
 
 app = FastAPI()
@@ -11,7 +12,7 @@ app = FastAPI()
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust this in production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -29,7 +30,7 @@ class APIHit(Base):
     __tablename__ = "postgres"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    timestamp = Column(DateTime, default=datetime.now())
     request_type = Column(String)
     endpoint = Column(String)
     user_agent = Column(String)
@@ -79,7 +80,7 @@ async def root():
 @app.get("/dashboard/hits")
 async def get_api_hits():
     db = SessionLocal()
-    hits = db.query(APIHit).all()
+    hits = db.query(APIHit).order_by(desc(APIHit.timestamp)).all()
     db.close()
     return hits
 
@@ -110,10 +111,12 @@ async def get_browser_stats():
             browser_stats[browser] = round(percentage, 2)
         
         # Sort the results by percentage in descending order
-        sorted_stats = dict(sorted(browser_stats.items(), key=lambda x: x[1], reverse=True))
-        
+        sorted_stats = dict(
+            sorted(browser_stats.items(), key=lambda x: x[1], reverse=True)
+        )
+
         return sorted_stats
-    
+
     finally:
         db.close()
 
