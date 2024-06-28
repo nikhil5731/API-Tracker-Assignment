@@ -22,6 +22,12 @@ cd ./backend
 pip install -r requirements.txt
 python ./app.py
 ```
+OR
+```bash
+cd ./backend
+pip install -r requirements.txt
+uvicorn app:app --reload
+```
 
 ### For Frontend
 
