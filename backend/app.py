@@ -58,8 +58,8 @@ async def track_api_hit(request: Request, call_next):
             ip_address=request.client.host,
             request_body=str(await request.body()),
         )
-        db.add(api_hit)
-        db.commit()
+        # db.add(api_hit)
+        # db.commit()
     except Exception as e:
         print(f"Error tracking API hit: {e}")
     finally:
@@ -143,10 +143,10 @@ async def get_custom_chart_data(metric: str):
                 .group_by(APIHit.endpoint)
                 .all()
             )
-        elif metric == "hour":
+        elif metric == "user_agent":
             data = (
-                db.query(func.extract("hour", APIHit.timestamp), func.count(APIHit.id))
-                .group_by(func.extract("hour", APIHit.timestamp))
+                db.query(APIHit.user_agent, func.count(APIHit.id))
+                .group_by(APIHit.user_agent)
                 .all()
             )
         elif metric == "ip":

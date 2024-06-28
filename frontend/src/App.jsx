@@ -36,37 +36,36 @@ function App() {
   };
 
   return (
-    <div className="container mx-auto overflow-hidden w-screen">
-      <h1 className="text-3xl font-bold my-4 w-full overflow-hidden mx-auto text-center ">
+    <div className="h-screen w-screen overflow-x-hidden">
+      <h1 className="text-3xl font-bold text-center my-5">
         API Hit Tracking Dashboard
       </h1>
-      <div className="flex justify-center items-center w-full overflow-hidden flex-wrap">
-        <div className=" w-1/2">
+      <div className="flex justify-center flex-wrap">
+        <div className="md:w-1/3">
           <h2 className="text-xl font-semibold mb-2 text-center">
             Browser Statistics
           </h2>
           <BrowserPieChart data={browserStats} />
         </div>
-
-        <div className="w-1/2">
+        <div className="md:w-2/3">
           <h2 className="text-xl font-semibold mb-2 text-center">
             Custom Chart
           </h2>
           <select
-            className="mb-4 p-2 border rounded"
+            className="mb-4 p-2 border rounded bg-gray-100 border-gray-400 outline-none"
             value={selectedMetric}
             onChange={(e) => setSelectedMetric(e.target.value)}
           >
             <option value="os">Operating System</option>
             <option value="method">HTTP Method</option>
             <option value="endpoint">Endpoint</option>
-            <option value="hour">Hour of Day</option>
+            <option value="user_agent">User Agent</option>
             <option value="ip">IP Address</option>
           </select>
           <CustomBarChart data={customChartData} />
         </div>
       </div>
-      <div className="mt-10 w-full p-5">
+      <div className="my-10">
         <h2 className="text-xl font-semibold mb-2 text-center">API Hits</h2>
         <APIHitsTable hits={apiHits} />
       </div>
